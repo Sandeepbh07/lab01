@@ -1,20 +1,47 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import React, { useState } from 'react';
+import { View, FlatList, StyleSheet } from 'react-native';
+import TaskItem from './components/TaskItem';
+import TaskInput from './components/TaskInput';
 
-export default function App() {
+const App = () => {
+  const [taskList, setTaskList] = useState([]);
+
+  const addTask = (taskTitle) => {
+    setTaskList([...taskList, { id: Math.random().toString(), title: taskTitle, status: false }]);
+  };
+
+  const toggleStatus = (id) => {
+    setTaskList(
+      taskList.map((task) =>
+        task.id === id ? { ...task, status: !task.status } : task
+      )
+    );
+  };
+
+  const deleteTask = (id) => {
+    setTaskList(taskList.filter((task) => task.id !== id));
+  };
+
   return (
     <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
+      <TaskInput addTask={addTask} />
+      <FlatList
+        data={taskList}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
+          <TaskItem task={item} toggleStatus={toggleStatus} deleteTask={deleteTask} />
+        )}
+      />
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    padding: 20,
     backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flex: 1,
   },
 });
+
+export default App;
